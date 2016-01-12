@@ -1,0 +1,73 @@
+from sklearn import datasets
+import csv
+import numpy as np
+from sklearn.cross_validation import train_test_split
+from sklearn.metrics import accuracy_score
+
+
+class Dataset:
+    data_train = []
+    data_test = []
+    target_train = []
+    target_test = []
+
+    def __init__(self, data, targets, test_size, random_state):
+        Dataset.data_train, Dataset.data_test, Dataset.target_train, Dataset.target_test = train_test_split(
+                data, targets, test_size=test_size, random_state=random_state)
+
+
+class HardCoded:
+    def train(self, data_train, target_train):
+        print("Training data: ", data_train, "Training targets: ", target_train)
+
+    def predict(self, data_test):
+        print("Predicting with: ", data_test)
+        return_values = []
+        for instance in data_test:
+            return_values.append(0)
+
+        return return_values
+
+
+iris = datasets.load_iris()
+iris_data = iris.data
+iris_targets = iris.target
+
+iris_ds = Dataset(iris_data, iris_targets, .3, 42)
+
+
+hardCoded = HardCoded()
+
+hardCoded.train(iris_ds.data_train, iris_ds.target_train)
+
+answers = hardCoded.predict(iris_ds.data_test)
+
+print("The answers: ", answers)
+
+acc_score = accuracy_score(iris_ds.target_test, answers)
+
+print ("Accuracy of .predict() is: ", acc_score)
+
+print ("**********************CSV**************************")
+
+
+iris_csv = np.loadtxt('iris.csv', delimiter=",")
+X = iris_csv[:,0:4]
+Y = iris_csv[:,4]
+Y = Y.astype(int)
+
+print(X,'\n', Y)
+
+csv_ds = Dataset(X, Y, .3, 3333)
+
+csv_answers = hardCoded.predict(csv_ds.data_test)
+
+print("CSV answers: ", csv_answers)
+
+acc_score = accuracy_score(csv_ds.target_test, csv_answers)
+
+print("Accuracy of .predict() for csis: ", acc_score)
+
+
+
+
