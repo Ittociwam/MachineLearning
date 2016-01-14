@@ -1,0 +1,84 @@
+from sklearn import datasets
+import csv
+import numpy as np
+from sklearn.cross_validation import train_test_split
+from sklearn.metrics import accuracy_score
+
+
+class Dataset:
+    data_train = []
+    data_test = []
+    target_train = []
+    target_test = []
+    std_train = []
+    std_test = []
+
+    def __init__(self, data, targets, test_size, random_state):
+        Dataset.data_train, Dataset.data_test, Dataset.target_train, Dataset.target_test = train_test_split(
+                data, targets, test_size=test_size, random_state=random_state)
+
+    def standardize_data
+        std_train = (std_train - std_train.
+
+class KNN:
+    def train(self, data_train, target_train):
+        print("Training data: ", data_train, "Training targets: ", target_train)
+
+    def predict(self, data_test):
+        print("Predicting with: ", data_test)
+        return_values = []
+        for instance in data_test:
+            return_values.append(0)
+
+        return return_values
+
+    def knn(self, k, data, dataClass, inputs):
+        nInputs = np.shape(inputs)[0]
+        closest = np.zeros(nInputs)
+        print("NUM INPUTS: ", nInputs)
+
+        for n in range(nInputs):
+            print("********Iteration*********** #", n)
+
+            #euclidian distance for each training vector from the current input n
+            distances = np.sum((data-inputs[n,:])**2,axis=1)
+            print("distances: ", distances)
+
+
+            #sorts an array but keeps indexes the same
+            indices = np.argsort(distances,axis=0)
+            print("indices: ", indices)
+
+            # gets the dataclasses of indices 0 through k
+            # indices is an array of indices of our training data that has beeen sorted lowest to highest
+            # pulls out the lowest values from our sorted indices and gets the unique values or our possible predictions
+            classes = np.unique(dataClass[indices[:k]])
+            print("classes: ", classes)
+
+            # if all of the nearest neighbors are the same then we have found our prediction
+            if len(classes) == 1:
+                closest[n] = np.unique(classes)
+            else:
+            # otherwise
+                counts = np.zeros(max(classes)+ 1)
+                print("max classes: ", max(classes))
+                print("counts in else: ", counts)
+                for i in range(k):
+                    counts[dataClass[indices[i]]] += 1
+                    print("iterating through range counts: ", counts)
+                closest[n] = np.max(counts)
+        return closest
+
+
+iris = datasets.load_iris()
+iris_data = iris.data
+iris_targets = iris.target
+
+iris_ds = Dataset(iris_data, iris_targets, .3, 42)
+
+
+nearestneighbor = KNN()
+
+closest = nearestneighbor.knn(3, iris_ds.data_train, iris_ds.target_train, iris_ds.data_test)
+
+print("closest: ", closest)
