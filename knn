@@ -1,23 +1,18 @@
-from sklearn import datasets
-import csv
 import numpy as np
 from scipy.stats import mode
 from sklearn.cross_validation import train_test_split
 from scipy.spatial.distance import euclidean as euc_dis
 from sklearn.metrics import accuracy_score
-from collections import Counter
 from sklearn import preprocessing
 import pandas as pd
 
 
 class Dataset:
-
-
     def __init__(self, csv, test_size, random_state):
         self.ds = pd.read_csv(csv, header=None)
         ds_column_len = len(self.ds.columns)
         self.convert_nominal_data()
-        self.data = self.ds.loc[:,: ds_column_len - 2]
+        self.data = self.ds.loc[:, : ds_column_len - 2]
         self.targets = self.ds[ds_column_len - 1]
         print("ds_column_len: ", ds_column_len)
         print("datads: \n", self.data)
@@ -34,30 +29,21 @@ class Dataset:
         self.std_train = [0] * int(len(self.data_train))
         self.std_test = [0] * int(len(self.data_test))
 
-       # print("data before std: \n", self.data_train)
-       # print("target before std: \n", self.data_test)
-
         self.standardize_data()
-       # print ("std train: ", self.std_train)
-      #  print ("std test: ", self.std_test)
 
     def convert_nominal_data(self):
         le = preprocessing.LabelEncoder()
         num_col = len(self.ds.columns)
-       # print("There are: ", num_col, "cols")
 
         for i in range(0, num_col):
             has_string = False
             le.fit(self.ds[i])
             list_of_classes = list(le.classes_)
-           # print(list(le.classes_))
             for a_class in list_of_classes:
                 if isinstance(a_class, str):
                     has_string = True
             if has_string:
                 self.ds[i] = le.transform(self.ds[i])
-
-      #  print(self.ds)
 
     def standardize_data(self):
         # fill std_train with standardized values
@@ -65,15 +51,8 @@ class Dataset:
         # fill std_test with standardized values
         self.std_test = (self.data_test - self.data_train.mean()) / self.data_train.std()
 
-        # for n in range(len(self.data_train)):
-        #     self.std_train[n] = (self.data_train[n] - self.data_train.mean() / self.data_train.std())
-        #
-        # for n in range(len(self.data_test)):
-        #     self.std_test[n] = (self.data_test[n] - self.data_train.mean() / self.data_train.std())
-
 
 class KNN:
-
     def __init__(self, k, data, targets, inputs):
         self.k = k
         self.data = data
@@ -83,31 +62,15 @@ class KNN:
         self.closest = np.zeros(self.nInputs)
         print("NUM INPUTS:\n ", self.nInputs)
 
-    def train(self, data_train, target_train):
-        print("Training data: ", data_train, "Training targets: ", target_train)
-
-    def predict(self, data_test):
-        print("Predicting with: ", data_test)
-        return_values = []
-        for instance in data_test:
-            return_values.append(0)
-
-        return return_values
 
     def find_distances(self, input):
         # euclidian distance for each training vector from the current input n
-        #self.distances = euc_dis(self.data, input)
 
         # initialize distances to the length of data
         self.distances = [0] * int(len(self.data))
 
         # for each data vector, compare it to the current i and add it to the distances formula
-       # print("range of data: ", len(self.data))
         for j in range(len(self.data)):
-            #print("j is: ", j)
-           # print ("is this the row: ", self.data.iloc[0])
-           # print("euc_dis data: \n", self.data.iloc[j, :])
-           # print("euc_dis input: \n", input)
             self.distances[j] = euc_dis(self.data.iloc[j], input)
 
     def knn(self):
@@ -117,61 +80,28 @@ class KNN:
             print("********Iteration*********** #", i)
             self.find_distances(self.inputs.iloc[i])
 
-          #  print("distances: ", self.distances)
-
             # sorts an array but keeps indexes the same
             indices = np.argsort(self.distances, axis=0)
-           # print("indices: ", indices)
 
             self.possible_classes = []
             self.closest_classes = []
             self.counter_classes = []
             self.most_common_class = []
-            for n in range(0,self.k):
+            for n in range(0, self.k):
                 self.closest_classes.insert(n, self.targets.iloc[indices[n]])
             self.possible_classes = np.unique(self.closest_classes)
             print("closest classes: ", self.closest_classes)
-           # print("possible classes: ", self.possible_classes)
+            # print("possible classes: ", self.possible_classes)
 
             if self.k == 1:
                 self.closest[i] = np.unique(self.possible_classes)
             else:
-               # print(mode(self.possible_classes))
                 self.closest[i] = mode(self.closest_classes)[0][0]
                 print("insert: ", self.closest[i])
-                # while True:
-                #     if np.unique(self.possible_classes) is 1:
-                #         print(np.unique(self.possible_classes))
-                #         self.most_common_class = np.unique(self.possible_classes)
-                #         break
-                #     self.counter_classes = Counter(self.closest_classes)
-                #     self.most_common_class = self.counter_classes.most_common(len(self.possible_classes))
-                #     # self.most_common_class = most_common(self.possible_classes.tolist())
-                #     # self.most_common_class = np.asarray(self.most_common_class)
-                #
-                #     if len(self.most_common_class) is 1:
-                #         print("length is 1: ", self.most_common_class)
-                #         break
-                #     else:
-                #     #for each most common class, determine which has highest value, if there are 2 with highest THEN delete one
-                #         class_values = [len(self.most_common_class)]
-                #         for class_occurance in self.most_common_class:
-                #             print("APPENDING ", class_occurance[1])
-                #             class_values.append(class_occurance[1])
-                #         index_of_most_occuring_class = class_occurance.index(max(class_occurance))
-                #         print("INDEX OF MOST OCCURING: ", index_of_most_occuring_class)
-                #     print("The most common class is: ", self.most_common_class)
-                #
-                #     if len(self.most_common_class) is 1:
-                #         print("length is 1: ", self.most_common_class)
-                #         break
-                #     del self.closest_classes[-1]
-                #     print ("deleted last, closest is now: ", self.closest_classes)
-                # self.closest[i] = self.most_common_class[0][0]
         return self.closest
 
 
-print ("**********************CSV**************************26")
+print("**********************CSV**************************26")
 
 my_dataset = Dataset('cars', .3, 3333)
 

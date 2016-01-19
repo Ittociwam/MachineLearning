@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c5550f4e-7653-40d8-8e25-72386ae933e9" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/iris.csv" afterPath="$PROJECT_DIR$/iris.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/knn" afterPath="$PROJECT_DIR$/knn" />
     </list>
     <ignored path="untitled1.iws" />
@@ -40,10 +38,10 @@
       <file leaf-file-name="knn" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/knn">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.35279188">
-              <caret line="175" column="26" selection-start-line="175" selection-start-column="26" selection-end-line="175" selection-end-column="26" />
+            <state vertical-scroll-proportion="-2.5380712">
+              <caret line="66" column="78" selection-start-line="66" selection-start-column="78" selection-end-line="66" selection-end-column="78" />
               <folding>
-                <element signature="e#0#28#0" expanded="true" />
+                <element signature="e#0#18#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -404,7 +402,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="69" column="37" selection-start-line="69" selection-start-column="37" selection-end-line="69" selection-end-column="37" />
           <folding>
-            <element signature="e#0#28#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -432,7 +430,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#0#28#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -460,7 +458,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#0#28#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -488,7 +486,7 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#0#28#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -593,10 +591,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/knn">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.35279188">
-          <caret line="175" column="26" selection-start-line="175" selection-start-column="26" selection-end-line="175" selection-end-column="26" />
+        <state vertical-scroll-proportion="-2.5380712">
+          <caret line="66" column="78" selection-start-line="66" selection-start-column="78" selection-end-line="66" selection-end-column="78" />
           <folding>
-            <element signature="e#0#28#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
