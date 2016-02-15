@@ -89,20 +89,22 @@ class Dataset:
         # fill std_test with standardized values
         self.std_test = (self.data_test - self.data_train.mean()) / self.data_train.std()
 
+
+
 class NeuralNetwork:
-    def __init__(self, learning_rate, data, targets, inputs, num_layers=2):
+    def __init__(self, learning_rate, data, targets, num_layers=1):
         self.learning_rate = learning_rate
         self.data = data
         self.bias = -1
         self.targets = targets
         self.labels = np.unique(targets)
-        self.inputs = inputs
         self.neurons = []
         self.num_inputs = len(self.data.columns)
         self.input_list = []
         self.layers = []
         #self.label_dict = defaultdict(list)
         print("data_inputs: \n", self.data)
+        print("targets: ", targets)
         self.build_network(num_layers)
 
     # build_network will build the network, the network will be stored in a multidimentional array
@@ -119,7 +121,9 @@ class NeuralNetwork:
             for i in range(num_layers - 1):
                 this_layer = []
                 #prompt user for num neurons in this layer
-                num_neurons = 2
+                prompt = "How many neurons in layer " + str(i) + " ?  > "
+                num_neurons = input(prompt)
+                num_neurons = int(num_neurons)
                 for j in range(num_neurons):
                     #make that many neurons in the layer
                     new_neuron = self.Neuron(layer_inputs)
@@ -154,28 +158,67 @@ class NeuralNetwork:
         print(network_output, "COUNTER: ", counter)
 
 
+    def feed_forward(self, inputs):
+        prediction_outputs = []
+        #run the test data through the network and send back an array of predicted targets
+        for test_input in inputs.iterrows():
+            outputs = []
+            iteration_inputs = test_input
+            for layer in self.layers:
+                outputs = []
+                for neuron in layer:
+                    outputs.append(neuron.compute_activation(iteration_inputs))
+                iteration_inputs = (1, outputs)
+            prediction_outputs.append(outputs)
+        return prediction_outputs
+
+    def predict(self, inputs):
+        prediction_outputs = self.feed_forward(inputs)
+        # prediction_outputs = []
+        # #run the test data through the network and send back an array of predicted targets
+        # for test_input in inputs.iterrows():
+        #     outputs = []
+        #     iteration_inputs = test_input
+        #     for layer in self.layers:
+        #         outputs = []
+        #         for neuron in layer:
+        #             outputs.append(neuron.compute_activation(iteration_inputs))
+        #         iteration_inputs = (1, outputs)
+        #     prediction_outputs.append(outputs)
+        prediction = self.get_prediction(prediction_outputs)
+        return prediction
+
+    def get_prediction(self, prediction_outputs):
+        prediction = []
+        for prediction_output in prediction_outputs:
+            prediction.append(np.argmax(prediction_output))
+        return prediction
+
+
+
+
+
     class Neuron:
         def __init__(self, num_inputs):
             self.rangemax = 1.0
             self.rangemin = -1.0
-            self.inputs = []
+            self.neuron_inputs = []
             self.threshold = 0
             for i in range(num_inputs):
                 print("appending input number: ", i)
-                self.inputs.append(self.Input(random.uniform(self.rangemin, self.rangemax)))
+                self.neuron_inputs.append(self.Input(random.uniform(self.rangemin, self.rangemax)))
             #make bias input the last input
-            self.inputs.append(self.Input(random.uniform(self.rangemin, self.rangemax)))
+            self.neuron_inputs.append(self.Input(random.uniform(self.rangemin, self.rangemax)))
             print("making a neuron with ", num_inputs, " inputs\n")
 
         def compute_activation(self, input):
-            #assert input is len(self.inputs)
+            #assert input is len(self.neuron_inputs)
             _sum = 0
             #loop through all inputs
-            #print("for compute we are looping through range: ", range(len(self.inputs) - 1))
-            for i in range(len(self.inputs) -1):
-                _sum += self.inputs[i].weight * input[1][i]
+            for i in range(len(self.neuron_inputs) -1):
+                _sum += self.neuron_inputs[i].weight * input[1][i]
             #calculate for bias input -1 gets last element in an array
-            _sum += self.inputs[-1].weight * 1
+            _sum += self.neuron_inputs[-1].weight * 1
             self.sigmoid(_sum)
             return _sum #> self.threshold:
                # return 1
@@ -197,11 +240,13 @@ class NeuralNetwork:
 
 print("**********************CSV**************************")
 
-my_dataset = Dataset('indian', .3, 3333, False)
+my_dataset = Dataset('iris.csv', .3, 3333, False)
 
-nn = NeuralNetwork(.3, my_dataset.data_train, my_dataset.target_train, my_dataset.data_test)
+nn = NeuralNetwork(.3, my_dataset.data_train, my_dataset.target_train)
 
 nn.train_network()
+
+prediction = nn.predict(my_dataset.data_test)
 
 
 #closest = nearestneighbor.knn()
@@ -210,7 +255,7 @@ nn.train_network()
 
 #print("closest: ", closest)
 
-#acc_score = accuracy_score(my_dataset.target_test, closest)
+acc_score = accuracy_score(my_dataset.target_test, prediction)
 
-#print("Accuracy of .knn() is: ", acc_score)
+print("Accuracy of Neural Network is: ", acc_score)
 
