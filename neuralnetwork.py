@@ -104,8 +104,11 @@ class NeuralNetwork:
         self.layers = []
         #self.label_dict = defaultdict(list)
         print("data_inputs: \n", self.data)
-        print("targets: ", targets)
+        print("targets: \n", targets)
         self.build_network(num_layers)
+        self.TARGET_CODES = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+        #                      a       b
+        #self.TARGET_CODES = [[1, 0], [0, 1]]
 
     # build_network will build the network, the network will be stored in a multidimentional array
     # A network with 3 input neurons, 1 layer of 2 hidden neurons and 4 output neurons would be stored like this:
@@ -122,7 +125,7 @@ class NeuralNetwork:
                 this_layer = []
                 #prompt user for num neurons in this layer
                 prompt = "How many neurons in layer " + str(i) + " ?  > "
-                num_neurons = input(prompt)
+                num_neurons = 2 #input(prompt)
                 num_neurons = int(num_neurons)
                 for j in range(num_neurons):
                     #make that many neurons in the layer
@@ -144,19 +147,65 @@ class NeuralNetwork:
         counter = 0
         #loop through each row
         for data_inputs in self.data.iterrows():
-            outputs = []
+            layer_outputs = []
             iteration_inputs = data_inputs
+            all_outputs = []
             for layer in (self.layers):
-                outputs = []
+                layer_outputs = []
                 for neuron in layer:
                     counter += 1
-                    outputs.append(neuron.compute_activation(iteration_inputs))
-                iteration_inputs = (1, outputs)
-            #error = sum_of_squares_error(outputs) #will compare with targets
-            #go_back_and_change_weights(error)
-            network_output.append(outputs)
-        print(network_output, "COUNTER: ", counter)
+                    layer_outputs.append(neuron.compute_activation(iteration_inputs))
+                iteration_inputs = (1, layer_outputs)
+                all_outputs.append(layer_outputs)
+            is_output = True
+            #iterate backwards thru the layers starting with output layer
+            prev_error = None
+            for i in range(len(self.layers) - 1, -1, -1):
+                if is_output:
+                    error = self.error_output(self.layers[i], all_outputs[i], self.targets[data_inputs[0]])
+                    self.add_new_weights(self.layers[i], all_outputs[i], error)
+                    prev_error = error
+                    is_output = False
+                    #calc weight updates?
+                else:
+                    error = self.error_hidden(self.layers[i], all_outputs[i], self.layers[i + 1], prev_error)
+                    prev_error = error
+                    self.add_new_weights(self.layers[i], all_outputs[i], error)
+            self.update_weights()
+            network_output.append(layer_outputs)
 
+
+    def add_new_weights(self, layer, outputs, errors):
+        for i, neuron in enumerate(layer):
+            for input in neuron.neuron_inputs:
+                input.new_weight = input.weight - (self.learning_rate*outputs[i]*errors[i])
+
+    def error_output(self, layer, outputs, target):
+        target_code = self.TARGET_CODES[target]
+        error_list = []
+        #output layer outputs are in pandas format
+        for i in range(0, len(layer)):
+            error = (outputs[i]) * (1 - outputs[i]) * (outputs[i] - target_code[i])
+            error_list.append(error)
+        return error_list
+
+
+
+    def error_hidden(self, layer, outputs, prev_layer, error_list):
+        _sum_weights_errors = 0
+        for i in range(0, len(layer)):
+            for j, neuron in enumerate(prev_layer):
+                #WHAT INPUTS ARE GOING IN HERE?
+                _sum_weights_errors += neuron.neuron_inputs[i].weight * error_list[j]
+            error = (outputs[i]) * (1-outputs[i]) * _sum_weights_errors
+            error_list.append(error)
+        return error_list
+
+
+    def update_weights(self):
+        for layer in self.layers:
+            for neuron in layer:
+                neuron.update_weights()
 
     def feed_forward(self, inputs):
         prediction_outputs = []
@@ -204,12 +253,24 @@ class NeuralNetwork:
             self.rangemin = -1.0
             self.neuron_inputs = []
             self.threshold = 0
+            #self.testweight = 0.1
             for i in range(num_inputs):
-                print("appending input number: ", i)
-                self.neuron_inputs.append(self.Input(random.uniform(self.rangemin, self.rangemax)))
+                #self.testweight += 0.1
+
+                weight = random.uniform(self.rangemin, self.rangemax)
+                print("appending input number: ", i, "with weight: ", weight)
+                self.neuron_inputs.append(self.Input(weight))
+                #self.neuron_inputs.append(self.Input(self.testweight))
             #make bias input the last input
-            self.neuron_inputs.append(self.Input(random.uniform(self.rangemin, self.rangemax)))
+            print("bias: ")
+            bias_weight = random.uniform(self.rangemin, self.rangemax)
+            self.neuron_inputs.append(self.Input(bias_weight))
+            #self.neuron_inputs.append(self.Input(self.testweight + .1))
             print("making a neuron with ", num_inputs, " inputs\n")
+
+        def update_weights(self):
+            for input in self.neuron_inputs:
+                input.update_weight()
 
         def compute_activation(self, input):
             #assert input is len(self.neuron_inputs)
@@ -218,33 +279,38 @@ class NeuralNetwork:
             for i in range(len(self.neuron_inputs) -1):
                 _sum += self.neuron_inputs[i].weight * input[1][i]
             #calculate for bias input -1 gets last element in an array
-            _sum += self.neuron_inputs[-1].weight * 1
-            self.sigmoid(_sum)
-            return _sum #> self.threshold:
+            _sum += self.neuron_inputs[-1].weight * -1
+            return self.sigmoid(_sum) #> self.threshold:
                # return 1
            # else:
               #  return 0
 
         def sigmoid(self, x):
-            return 1 / (1 + np.exp(-1))
+            return 1 / (1 + np.exp(-x))
 
         def dsigmoid(self, y):
             return y ( (1.0 - y))
 
         class Input:
             def __init__(self, weight):
+                print("weight: ", weight)
                 self.weight = weight
+                self.new_weight = None
+
+            def update_weight(self):
+                self.weight = self.new_weight
 
 
 
 
 print("**********************CSV**************************")
 
-my_dataset = Dataset('iris.csv', .3, 3333, False)
+my_dataset = Dataset('indian', .3, 3333, False)
 
-nn = NeuralNetwork(.3, my_dataset.data_train, my_dataset.target_train)
+nn = NeuralNetwork(.3, my_dataset.data_train, my_dataset.target_train, 2)
 
-nn.train_network()
+for i in range(15):
+    nn.train_network()
 
 prediction = nn.predict(my_dataset.data_test)
 
